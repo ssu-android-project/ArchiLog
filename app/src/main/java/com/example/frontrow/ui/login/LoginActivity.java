@@ -41,8 +41,8 @@ public class LoginActivity extends AppCompatActivity {
         loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
 
-        final EditText usernameEditText = binding.username;
-        final EditText passwordEditText = binding.password;
+        final EditText usernameEditText = binding.usernameEditText;
+        final EditText passwordEditText = binding.passwordEditText;
         final Button loginButton = binding.login;
         final ProgressBar loadingProgressBar = binding.loading;
 
@@ -126,16 +126,14 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        //
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                // SignUpActivity 로 이동
-                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-                startActivity(intent);
+                // TODO: SignUpActivity 구현 후 활성화
+                Toast.makeText(LoginActivity.this, "준비 중인 액티비티.", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
     private void updateUiWithUser(LoggedInUserView model) {

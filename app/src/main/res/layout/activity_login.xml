@@ -43,6 +43,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- 이메일 -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/usernameLayout"
         android:layout_width="0dp"
@@ -54,14 +55,15 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/username"
+            android:id="@+id/usernameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress"
             android:selectAllOnFocus="true"
-            tools:text="archi@example.com"/>
+            tools:text="archi@example.com" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- 비밀번호 -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/passwordLayout"
         android:layout_width="0dp"
@@ -74,15 +76,16 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/password"
+            android:id="@+id/passwordEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:imeOptions="actionDone"
             android:selectAllOnFocus="true"
-            tools:text="password"/>
+            tools:text="password" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- 로그인 버튼 -->
     <Button
         android:id="@+id/login"
         android:layout_width="0dp"
@@ -94,6 +97,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- 회원이 아니세요? + 회원가입 -->
     <TextView
         android:id="@+id/notAMember"
         android:layout_width="wrap_content"
@@ -117,8 +121,9 @@
         app:layout_constraintTop_toBottomOf="@id/login"
         app:layout_constraintStart_toEndOf="@id/notAMember"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBaseline_toBaselineOf="@id/notAMember"/>
+        app:layout_constraintBaseline_toBaselineOf="@id/notAMember" />
 
+    <!-- 로딩 -->
     <ProgressBar
         android:id="@+id/loading"
         android:layout_width="wrap_content"
