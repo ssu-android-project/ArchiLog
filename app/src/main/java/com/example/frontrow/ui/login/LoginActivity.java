@@ -46,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
         final Button loginButton = binding.login;
         final ProgressBar loadingProgressBar = binding.loading;
 
-        // ⭐ 추가 — 회원가입 버튼 binding
+        //
         final Button signupButton = binding.signup;
         // (주의: activity_login.xml 에 android:id="@+id/signup" 로 되어 있어야 함)
 
@@ -126,7 +126,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        // ⭐ 추가 — 회원가입 이동 처리
+        //
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
