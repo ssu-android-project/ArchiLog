@@ -1,14 +1,251 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".mypage.MyPageFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <!-- 상단 타이틀 -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:id="@+id/tvMyPageTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:gravity="center"
+        android:text="마이 페이지"
+        android:fontFamily="@font/pretendard_bold"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-</FrameLayout>
+    <!-- 프로필 영역 -->
+    <LinearLayout
+        android:id="@+id/layoutProfile"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        app:layout_constraintTop_toBottomOf="@id/tvMyPageTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- 아바타 + 수정 아이콘 겹치기 -->
+        <FrameLayout
+            android:layout_width="80dp"
+            android:layout_height="80dp">
+
+            <ImageView
+                android:id="@+id/imgAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_avatar"
+                android:scaleType="centerCrop"
+                android:background="@drawable/avartar_round"
+                android:layout_gravity="center"
+                android:padding="4dp"
+                android:cropToPadding="true" />
+
+            <ImageView
+                android:id="@+id/btnEditAvatar"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="2dp"
+                android:src="@drawable/ic_edit_profile" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tvUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="슝슝이"
+            android:textSize="16sp"
+            android:fontFamily="@font/pretendard_bold" />
+
+        <TextView
+            android:id="@+id/tvUserId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="\@shoooong"
+            android:textSize="12sp"
+            android:textColor="#888888"
+            android:fontFamily="@font/pretendard_extra_light"/>
+
+    </LinearLayout>
+
+    <!-- 메뉴 리스트 -->
+    <LinearLayout
+        android:id="@+id/layoutMenuList"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="50dp"
+        android:orientation="vertical"
+        android:showDividers="middle"
+        android:divider="@color/gray"
+        android:dividerPadding="0dp"
+        app:layout_constraintTop_toBottomOf="@id/layoutProfile"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- 내 탐사 카드 -->
+        <LinearLayout
+            android:id="@+id/rowMyCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="내 답사 카드"
+                android:textSize="14sp"
+                android:fontFamily="@font/pretendard_semi_bold"/>
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_menu_more" />
+        </LinearLayout>
+
+        <!-- 내 답사 지도 -->
+        <LinearLayout
+            android:id="@+id/rowMyMap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="내 답사 지도"
+                android:textSize="14sp"
+                android:fontFamily="@font/pretendard_semi_bold"/>
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_menu_more" />
+        </LinearLayout>
+
+        <!-- 답사 캘린더 -->
+        <LinearLayout
+            android:id="@+id/rowCalendar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="답사 캘린더"
+                android:textSize="14sp"
+                android:fontFamily="@font/pretendard_semi_bold"/>
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_menu_more" />
+        </LinearLayout>
+
+        <!-- 북마크한 건축물 -->
+        <LinearLayout
+            android:id="@+id/rowBookmarked"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="북마크한 건축물"
+                android:textSize="14sp"
+                android:fontFamily="@font/pretendard_semi_bold"/>
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_menu_more" />
+        </LinearLayout>
+
+        <!-- 내가 좋아요 누른 후기 -->
+        <LinearLayout
+            android:id="@+id/rowLikedReviews"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="내가 좋아요 누른 후기"
+                android:textSize="14sp"
+                android:fontFamily="@font/pretendard_semi_bold"/>
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_menu_more" />
+        </LinearLayout>
+
+        <!-- 로그아웃 -->
+        <LinearLayout
+            android:id="@+id/rowLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="로그아웃"
+                android:textSize="14sp"
+                android:fontFamily="@font/pretendard_semi_bold"/>
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_menu_more" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

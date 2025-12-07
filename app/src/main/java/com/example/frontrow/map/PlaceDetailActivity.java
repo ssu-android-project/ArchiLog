@@ -17,12 +17,6 @@ public class PlaceDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_detail);
 
-        ImageButton btnBack = findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> {
-            // 이전 화면(맵 프래그먼트 있는 액티비티)으로 돌아감
-            finish();
-        });
-
         // MapFragment 에서 넘겨준 place_index 사용
         int index = getIntent().getIntExtra("place_index", -1);
         if (index < 0 || index >= PlaceRepository.PLACES.length) {

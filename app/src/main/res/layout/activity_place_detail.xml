@@ -23,15 +23,6 @@
                 android:scaleType="centerCrop"
                 tools:src="@drawable/sample_building" />
 
-            <!-- 뒤로가기 아이콘 -->
-            <ImageButton
-                android:id="@+id/btnBack"
-                android:layout_width="25dp"
-                android:layout_height="40dp"
-                android:layout_marginTop="45dp"
-                android:layout_marginStart="20dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_back" />
         </FrameLayout>
 
         <!-- 내용 영역 -->

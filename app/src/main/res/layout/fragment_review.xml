@@ -1,14 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".review.ReviewFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <!-- 답사 후기 카드 스와이프 -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vpReview"
+        android:layout_width="400dp"
+        android:layout_height="600dp"
+        android:padding="32dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="40dp"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        android:overScrollMode="never" />
+
+    <!-- 후기 작성 플로팅 버튼 -->
+    <ImageView
+        android:id="@+id/btnAddReview"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="@drawable/btn_floating"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="100dp"
+        android:layout_marginEnd="20dp"
+        android:clickable="true"
+        android:focusable="true" />
 
 </FrameLayout>

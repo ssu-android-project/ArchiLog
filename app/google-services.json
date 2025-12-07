@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "238329505134",
+    "project_id": "archilog-8e446",
+    "storage_bucket": "archilog-8e446.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:238329505134:android:c719e513adf9f88e508d7f",
+        "android_client_info": {
+          "package_name": "com.example.frontrow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "238329505134-40088185p29eurvv0ghj9slk55tu8a93.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.frontrow",
+            "certificate_hash": "5cb0dbefabe48682207c89bfcb31da0e014f0c3f"
+          }
+        },
+        {
+          "client_id": "238329505134-06brk7mh10mm39dp2u3vlogt888t2s3s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4_VfBcwrXigZRcDvhiBE2huWlUn4ScEg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "238329505134-06brk7mh10mm39dp2u3vlogt888t2s3s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
