@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".review.ReviewWriteActivity">
+
+    <!-- ★ 상단 고정바 (X 버튼 + 가운데 정렬 타이틀) -->
+    <LinearLayout
+        android:id="@+id/layoutTopBar"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- X 나가기 버튼 (텍스트로 X 표시) -->
+        <TextView
+            android:id="@+id/btnClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="✕"
+            android:textSize="22sp"
+            android:fontFamily="@font/pretendard_semi_bold"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- 가운데 정렬 타이틀 -->
+        <TextView
+            android:id="@+id/tvTopTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="후기 등록하기"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:fontFamily="@font/pretendard_bold" />
+
+        <!-- 오른쪽 공간 맞추기용 더미 뷰 -->
+        <View
+            android:layout_width="24dp"
+            android:layout_height="1dp" />
+    </LinearLayout>
+
+    <!-- 스크롤 전체 영역 -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollRoot"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/layoutTopBar"
+        app:layout_constraintBottom_toTopOf="@+id/btnSubmit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="24dp">
+
+            <!-- ====== 사진 영역 ====== -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="사진"
+                android:textSize="14sp"
+                android:fontFamily="@font/pretendard_semi_bold"/>
+
+            <TextView
+                android:id="@+id/tvPhotoGuide"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="최대 10장까지 첨부할 수 있어요."
+                android:textSize="12sp"
+                android:textColor="#888888"
+                android:paddingTop="2dp"
+                android:paddingBottom="8dp"/>
+
+            <!-- + 버튼 + 썸네일 한 줄 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- + 버튼 (갤러리 열기) : 처음에 이것만 보임 -->
+                <LinearLayout
+                    android:id="@+id/layoutPhotoAdd"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/photo_add_background">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_camera"
+                        android:tint="@android:color/black"/>
+
+                    <TextView
+                        android:id="@+id/tvPhotoCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0/10"
+                        android:textSize="12sp"
+                        android:paddingTop="4dp"/>
+                </LinearLayout>
+
+                <!-- 선택된 사진 썸네일 리스트 (가로 스크롤) : 처음엔 안 보이게 -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvPhotos"
+                    android:layout_width="0dp"
+                    android:layout_height="96dp"
+                    android:layout_weight="1"
+                    android:paddingStart="12dp"
+                    android:overScrollMode="never"
+                    android:visibility="gone"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:orientation="horizontal"
+                    tools:listitem="@layout/item_photo_thumb"/>
+            </LinearLayout>
+
+            <!-- 구분선 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#EEEEEE"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- 제목 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="제목"
+                android:textSize="14sp"
+                android:fontFamily="@font/pretendard_semi_bold"/>
+
+            <EditText
+                android:id="@+id/etTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="후기 제목을 입력해 주세요"
+                android:maxLines="1"
+                android:inputType="text"
+                android:background="@drawable/edittext_bg"
+                android:padding="12dp"
+                android:textSize="14sp"
+                android:layout_marginTop="6dp"/>
+
+            <!-- 방문한 건축물 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="방문한 건축물"
+                android:textSize="14sp"
+                android:fontFamily="@font/pretendard_semi_bold"
+                android:layout_marginTop="16dp"/>
+
+            <EditText
+                android:id="@+id/etPlace"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="예) 아모레퍼시픽 본사, DDP"
+                android:maxLines="1"
+                android:inputType="text"
+                android:background="@drawable/edittext_bg"
+                android:padding="12dp"
+                android:textSize="14sp"
+                android:layout_marginTop="6dp"/>
+
+            <!-- 방문일자 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="방문일자"
+                android:textSize="14sp"
+                android:fontFamily="@font/pretendard_semi_bold"
+                android:layout_marginTop="16dp"/>
+
+            <EditText
+                android:id="@+id/etDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="날짜를 선택해 주세요"
+                android:focusable="false"
+                android:clickable="true"
+                android:inputType="none"
+                android:background="@drawable/edittext_bg"
+                android:padding="12dp"
+                android:textSize="14sp"
+                android:layout_marginTop="6dp"/>
+
+            <!-- ===== 별점 영역 ===== -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="별점"
+                android:textSize="14sp"
+                android:fontFamily="@font/pretendard_semi_bold"
+                android:layout_marginTop="16dp"/>
+
+            <LinearLayout
+                android:id="@+id/layoutRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="6dp">
+
+                <ImageView
+                    android:id="@+id/star1"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/btn_star"
+                    android:padding="2dp" />
+
+                <ImageView
+                    android:id="@+id/star2"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/btn_star"
+                    android:padding="2dp" />
+
+                <ImageView
+                    android:id="@+id/star3"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/btn_star"
+                    android:padding="2dp" />
+
+                <ImageView
+                    android:id="@+id/star4"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/btn_star"
+                    android:padding="2dp" />
+
+                <ImageView
+                    android:id="@+id/star5"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/btn_star"
+                    android:padding="2dp" />
+            </LinearLayout>
+
+            <!-- 건축 태그 영역 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="건축 태그 (최소 2개)"
+                android:textSize="14sp"
+                android:fontFamily="@font/pretendard_semi_bold"
+                android:layout_marginTop="16dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="6dp">
+
+                <EditText
+                    android:id="@+id/etTag1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="예) 브루탈리즘"
+                    android:maxLines="1"
+                    android:background="@drawable/edittext_bg"
+                    android:padding="10dp"
+                    android:textSize="13sp"/>
+
+                <Space
+                    android:layout_width="8dp"
+                    android:layout_height="1dp"/>
+
+                <EditText
+                    android:id="@+id/etTag2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="예) 노출 콘크리트"
+                    android:maxLines="1"
+                    android:background="@drawable/edittext_bg"
+                    android:padding="10dp"
+                    android:textSize="13sp"/>
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/etTagMore"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="추가 태그가 있다면 쉼표로 구분해서 입력 (선택)"
+                android:background="@drawable/edittext_bg"
+                android:padding="10dp"
+                android:textSize="13sp"
+                android:layout_marginTop="6dp"/>
+
+            <!-- 상세 후기 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="자세한 후기"
+                android:textSize="14sp"
+                android:fontFamily="@font/pretendard_semi_bold"
+                android:layout_marginTop="16dp"/>
+
+            <EditText
+                android:id="@+id/etBody"
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
+                android:hint="공간 동선, 빛, 재료, 소리, 사람 분위기까지 자유롭게 기록해 주세요."
+                android:background="@drawable/edittext_bg"
+                android:padding="12dp"
+                android:textSize="14sp"
+                android:gravity="top"
+                android:inputType="textMultiLine"
+                android:overScrollMode="always"
+                android:scrollbars="vertical"
+                android:layout_marginTop="6dp"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- 하단 등록 버튼 -->
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:text="후기 등록"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:backgroundTint="@color/black"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

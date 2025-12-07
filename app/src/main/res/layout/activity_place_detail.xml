@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".map.PlaceDetailActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="300dp">
+
+            <!-- 상단 큰 이미지 -->
+            <ImageView
+                android:id="@+id/imgDetailBuilding"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:scaleType="centerCrop"
+                tools:src="@drawable/sample_building" />
+
+        </FrameLayout>
+
+        <!-- 내용 영역 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- 제목 + 북마크 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/tvDetailTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="20sp"
+                    android:fontFamily="@font/pretendard_extra_bold"
+                    tools:text="아모레퍼시픽 본사" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_bookmark"
+                    android:scaleType="centerInside" />
+            </LinearLayout>
+
+            <!-- 건축가 -->
+            <TextView
+                android:id="@+id/tvDetailArchitect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:textSize="14sp"
+                android:fontFamily="@font/pretendard_semi_bold"
+                tools:text="🇬🇧 데이비드 치퍼필드" />
+
+            <!-- 섹션: 설명 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="설명"
+                android:textSize="13sp"
+                android:fontFamily="@font/pretendard_bold" />
+
+            <TextView
+                android:id="@+id/tvDetailDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:textSize="12sp"
+                android:fontFamily="@font/pretendard_extra_light"
+                tools:text="대규모 중정(Courtyard)과 수직 루버 파사드..." />
+
+            <!-- 섹션: 위치 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="위치"
+                android:textSize="13sp"
+                android:fontFamily="@font/pretendard_bold" />
+
+            <TextView
+                android:id="@+id/tvDetailLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:textSize="12sp"
+                android:fontFamily="@font/pretendard_extra_light"
+                tools:text="서울 용산구 한강대로 100" />
+
+            <!-- 섹션: 영업시간 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="영업시간"
+                android:textSize="13sp"
+                android:fontFamily="@font/pretendard_bold" />
+
+            <TextView
+                android:id="@+id/tvDetailHours"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:textSize="12sp"
+                android:fontFamily="@font/pretendard_extra_light"
+                tools:text="10:00 - 18:00" />
+
+            <!-- 섹션: 알고 가면 좋아요 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="알고 가면 좋아요"
+                android:textSize="13sp"
+                android:fontFamily="@font/pretendard_bold" />
+
+            <TextView
+                android:id="@+id/tvDetailTips"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:textSize="12sp"
+                android:fontFamily="@font/pretendard_extra_light"
+                tools:text="- 박물관/도서관 등 공공공간 일부 무료 개방\n- 평일 낮 시간대 방문 추천" />
+
+            <!-- 섹션: 답사 포인트 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="답사 포인트"
+                android:textSize="13sp"
+                android:fontFamily="@font/pretendard_bold" />
+
+            <TextView
+                android:id="@+id/tvDetailPoints"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:textSize="12sp"
+                android:fontFamily="@font/pretendard_extra_light"
+                tools:text="- 거대한 중정 공간\n- 수직 루버 파사드 질감" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnWriteReview"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:text="후기 작성하기"
+                android:textSize="14sp"
+                android:fontFamily="@font/pretendard_extra_bold"
+                android:textColor="@color/black"
+                android:layout_marginBottom="6dp"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="12dp"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/black" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

@@ -1,8 +1,18 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+<resources>
     <style name="Base.Theme.FrontRow" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+        <!-- 배경색 앱 전체 적용 -->
+        <item name="android:windowBackground">@color/white</item>
+
+        <!-- 시스템 바 투명 -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+
+        <!-- 라이트 모드: 어두운 아이콘(검정) -->
+        <item name="android:windowLightStatusBar">true</item>          <!-- API 23+ -->
+        <item name="android:windowLightNavigationBar">true</item>
+
     </style>
 
     <style name="Theme.FrontRow" parent="Base.Theme.FrontRow" />

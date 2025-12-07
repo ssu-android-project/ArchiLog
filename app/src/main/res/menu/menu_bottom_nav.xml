@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_explore"
+        android:enabled="true"
+        android:icon="@drawable/ic_explore"
+        android:title="@string/nav_explore" />
+
+    <item
+        android:id="@+id/nav_reviews"
+        android:enabled="true"
+        android:icon="@drawable/ic_reviews"
+        android:title="@string/nav_reviews" />
+
+    <item
+        android:id="@+id/nav_profile"
+        android:enabled="true"
+        android:icon="@drawable/ic_my_page"
+        android:title="@string/nav_my_page" />
+
+</menu>

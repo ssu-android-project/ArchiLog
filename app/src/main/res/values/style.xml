@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ShapeAppearanceOverlay.App.Circular" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="Theme.Transparent" parent="Theme.AppCompat">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+    </style>
+
+    <style name="NoActiveIndicator">
+        <item name="android:color">@android:color/transparent</item>
+        <item name="android:alpha">0</item>
+    </style>
+
+    <!-- 로그아웃 다이얼로그 전용 테마 -->
+    <style name="LogoutDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="android:background">@color/white</item>
+        <!-- 라운드 모서리 -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.ArchiLog.LogoutDialog</item>
+
+        <!-- 제목, 본문 텍스트 스타일 -->
+        <item name="materialAlertDialogTitleTextStyle">@style/LogoutDialogTitleText</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/LogoutDialogBodyText</item>
+    </style>
+
+    <style name="ShapeAppearance.ArchiLog.LogoutDialog"
+        parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="LogoutDialogTitleText"
+        parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">@font/pretendard_bold</item>
+    </style>
+
+    <style name="LogoutDialogBodyText"
+        parent="MaterialAlertDialog.MaterialComponents.Body.Text">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/pretendard_extra_bold</item>
+    </style>
+
+</resources>
