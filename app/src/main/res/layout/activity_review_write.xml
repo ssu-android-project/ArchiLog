@@ -215,40 +215,141 @@
                 android:orientation="horizontal"
                 android:layout_marginTop="6dp">
 
-                <ImageView
-                    android:id="@+id/star1"
+                <!-- 1 -->
+                <FrameLayout
+                    android:id="@+id/starWrap1"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/btn_star"
-                    android:padding="2dp" />
+                    android:padding="2dp"
+                    android:clipChildren="true"
+                    android:clipToPadding="true">
 
-                <ImageView
-                    android:id="@+id/star2"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/btn_star"
-                    android:padding="2dp" />
+                    <ImageView
+                        android:id="@+id/starBg1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/btn_star"
+                        android:alpha="0.25"
+                        android:scaleType="fitXY"/>
 
-                <ImageView
-                    android:id="@+id/star3"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/btn_star"
-                    android:padding="2dp" />
+                    <ImageView
+                        android:id="@+id/starFg1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/btn_star"
+                        android:scaleType="fitXY"
+                        android:layout_gravity="start"
+                        android:visibility="gone"/>
+                </FrameLayout>
 
-                <ImageView
-                    android:id="@+id/star4"
+                <!-- 2 -->
+                <FrameLayout
+                    android:id="@+id/starWrap2"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/btn_star"
-                    android:padding="2dp" />
+                    android:padding="2dp"
+                    android:clipChildren="true"
+                    android:clipToPadding="true">
 
-                <ImageView
-                    android:id="@+id/star5"
+                    <ImageView
+                        android:id="@+id/starBg2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/btn_star"
+                        android:alpha="0.25"
+                        android:scaleType="fitXY"/>
+
+                    <ImageView
+                        android:id="@+id/starFg2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/btn_star"
+                        android:scaleType="fitXY"
+                        android:layout_gravity="start"
+                        android:visibility="gone"/>
+                </FrameLayout>
+
+                <!-- 3 -->
+                <FrameLayout
+                    android:id="@+id/starWrap3"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/btn_star"
-                    android:padding="2dp" />
+                    android:padding="2dp"
+                    android:clipChildren="true"
+                    android:clipToPadding="true">
+
+                    <ImageView
+                        android:id="@+id/starBg3"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/btn_star"
+                        android:alpha="0.25"
+                        android:scaleType="fitXY"/>
+
+                    <ImageView
+                        android:id="@+id/starFg3"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/btn_star"
+                        android:scaleType="fitXY"
+                        android:layout_gravity="start"
+                        android:visibility="gone"/>
+                </FrameLayout>
+
+                <!-- 4 -->
+                <FrameLayout
+                    android:id="@+id/starWrap4"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:padding="2dp"
+                    android:clipChildren="true"
+                    android:clipToPadding="true">
+
+                    <ImageView
+                        android:id="@+id/starBg4"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/btn_star"
+                        android:alpha="0.25"
+                        android:scaleType="fitXY"/>
+
+                    <ImageView
+                        android:id="@+id/starFg4"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/btn_star"
+                        android:scaleType="fitXY"
+                        android:layout_gravity="start"
+                        android:visibility="gone"/>
+                </FrameLayout>
+
+                <!-- 5 -->
+                <FrameLayout
+                    android:id="@+id/starWrap5"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:padding="2dp"
+                    android:clipChildren="true"
+                    android:clipToPadding="true">
+
+                    <ImageView
+                        android:id="@+id/starBg5"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/btn_star"
+                        android:alpha="0.25"
+                        android:scaleType="fitXY"/>
+
+                    <ImageView
+                        android:id="@+id/starFg5"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/btn_star"
+                        android:scaleType="fitXY"
+                        android:layout_gravity="start"
+                        android:visibility="gone"/>
+                </FrameLayout>
+
             </LinearLayout>
 
             <!-- 건축 태그 영역 -->

@@ -6,13 +6,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.view.View;              // ← 이미 있음
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ImageView;      // ★ 추가
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,21 +20,39 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.frontrow.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class ReviewWriteActivity extends AppCompatActivity {
 
-    // ReviewFragment로 돌려줄 때 사용할 키들
-    public static final String RESULT_TITLE  = "result_title";
-    public static final String RESULT_PLACE  = "result_place";
-    public static final String RESULT_DATE   = "result_date";
-    public static final String RESULT_TAG1   = "result_tag1";
-    public static final String RESULT_TAG2   = "result_tag2";
-    public static final String RESULT_BODY   = "result_body";
-    public static final String RESULT_RATING = "result_rating";
+    public static final String EXTRA_PRESET_PLACE = "extra_preset_place";
+
+    public static final String EXTRA_MODE = "extra_mode";
+    public static final String MODE_EDIT = "edit";
+
+    public static final String EXTRA_EDIT_REVIEW_ID = "extra_edit_review_id";
+    public static final String EXTRA_EDIT_TITLE  = "extra_edit_title";
+    public static final String EXTRA_EDIT_PLACE  = "extra_edit_place";
+    public static final String EXTRA_EDIT_DATE   = "extra_edit_date";
+    public static final String EXTRA_EDIT_TAG1   = "extra_edit_tag1";
+    public static final String EXTRA_EDIT_TAG2   = "extra_edit_tag2";
+    public static final String EXTRA_EDIT_BODY   = "extra_edit_body";
+    public static final String EXTRA_EDIT_RATING = "extra_edit_rating";
+    public static final String EXTRA_EDIT_MAIN_PHOTO_URL = "extra_edit_main_photo_url";
+    public static final String EXTRA_EDIT_PHOTO_URLS = "extra_edit_photo_urls";
+
+    public static final String RESULT_REVIEW_ID = "result_review_id";
+
     private static final int REQ_PICK_IMAGES = 1001;
     private static final int MAX_PHOTOS = 10;
 
@@ -47,16 +65,18 @@ public class ReviewWriteActivity extends AppCompatActivity {
 
     private EditText etTitle, etPlace, etDate, etTag1, etTag2, etTagMore, etBody;
 
-    // ★ 별점 관련
-    private ImageView star1, star2, star3, star4, star5;
-    private int selectedRating = 0;   // 0~5
+    private int selectedRating = 0; // Represents half-star count (0-10)
+    private View[] starWraps;
+    private ImageView[] starFg;
+
+    private boolean isEditMode = false;
+    private String editReviewId = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_review_write);
 
-        // ===== View 찾기 =====
         layoutPhotoAdd = findViewById(R.id.layoutPhotoAdd);
         tvPhotoCount   = findViewById(R.id.tvPhotoCount);
         rvPhotos       = findViewById(R.id.rvPhotos);
@@ -69,76 +89,150 @@ public class ReviewWriteActivity extends AppCompatActivity {
         etTagMore = findViewById(R.id.etTagMore);
         etBody    = findViewById(R.id.etBody);
 
-        Button btnSubmit = findViewById(R.id.btnSubmit);
-        TextView btnClose = findViewById(R.id.btnClose);
-        btnClose.setOnClickListener(v -> finish());
+        findViewById(R.id.btnClose).setOnClickListener(v -> finish());
+        findViewById(R.id.btnSubmit).setOnClickListener(v -> submitReview());
 
-        // ★ 별 이미지 뷰 찾기
-        star1 = findViewById(R.id.star1);
-        star2 = findViewById(R.id.star2);
-        star3 = findViewById(R.id.star3);
-        star4 = findViewById(R.id.star4);
-        star5 = findViewById(R.id.star5);
+        initStars();
+        initStarClicks();
+        setRating(0);
 
-        initStarClicks();   // ↓ 이 함수 호출
-        setRating(0);       // 초기 상태: 전부 비활성
-
-        // ===== 사진 RecyclerView 초기화 =====
-        rvPhotos.setLayoutManager(
-                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        );
+        rvPhotos.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         photoAdapter = new PhotoThumbAdapter(photoUris);
         rvPhotos.setAdapter(photoAdapter);
-
-        // 처음엔 아무 사진도 없으니 숨겨두기
         rvPhotos.setVisibility(View.GONE);
         updatePhotoCount();
 
-        // ===== 사진 추가 버튼 클릭 =====
         layoutPhotoAdd.setOnClickListener(v -> openGalleryForImages());
-
-        // ===== 날짜 선택 =====
         etDate.setOnClickListener(v -> showDatePicker());
 
-        // ===== 후기 등록 버튼 =====
-        btnSubmit.setOnClickListener(v -> submitReview());
-    }
+        String presetPlace = getIntent().getStringExtra(EXTRA_PRESET_PLACE);
+        if (presetPlace != null && !presetPlace.trim().isEmpty()) {
+            etPlace.setText(presetPlace.trim());
+            etPlace.setSelection(etPlace.getText().length());
+        }
 
-    private void initStarClicks() {
-        ImageView[] stars = {star1, star2, star3, star4, star5};
-
-        for (int i = 0; i < stars.length; i++) {
-            final int ratingValue = i + 1; // 1 ~ 5
-
-            stars[i].setOnClickListener(v -> {
-                // 같은 별을 다시 누르면 0점으로 초기화 (토글 느낌)
-                if (selectedRating == ratingValue) {
-                    setRating(0);
-                } else {
-                    setRating(ratingValue);
-                }
-            });
+        isEditMode = MODE_EDIT.equals(getIntent().getStringExtra(EXTRA_MODE));
+        if (isEditMode) {
+            editReviewId = getIntent().getStringExtra(EXTRA_EDIT_REVIEW_ID);
+            etTitle.setText(safe(getIntent().getStringExtra(EXTRA_EDIT_TITLE)));
+            etPlace.setText(safe(getIntent().getStringExtra(EXTRA_EDIT_PLACE)));
+            etDate.setText(safe(getIntent().getStringExtra(EXTRA_EDIT_DATE)));
+            etTag1.setText(safe(getIntent().getStringExtra(EXTRA_EDIT_TAG1)));
+            etTag2.setText(safe(getIntent().getStringExtra(EXTRA_EDIT_TAG2)));
+            etBody.setText(safe(getIntent().getStringExtra(EXTRA_EDIT_BODY)));
+            setRating(parseRatingToHalfStars(getIntent().getStringExtra(EXTRA_EDIT_RATING)));
+            ((TextView) findViewById(R.id.tvTopTitle)).setText("후기 수정하기");
+            ((Button) findViewById(R.id.btnSubmit)).setText("후기 수정");
         }
     }
 
-    private void setRating(int value) {
-        selectedRating = value;
+    private void submitReview() {
+        String title = etTitle.getText().toString().trim();
+        String place = etPlace.getText().toString().trim();
+        String date = etDate.getText().toString().trim();
+        String tag1 = etTag1.getText().toString().trim();
+        String tag2 = etTag2.getText().toString().trim();
+        String body = etBody.getText().toString().trim();
 
-        ImageView[] stars = {star1, star2, star3, star4, star5};
+        if (title.isEmpty() || place.isEmpty() || date.isEmpty() || selectedRating == 0 || tag1.isEmpty() || tag2.isEmpty() || body.isEmpty()) {
+            toast("모든 필드를 입력해주세요.");
+            return;
+        }
 
-        int activeColor   = androidx.core.content.ContextCompat.getColor(this, R.color.yellow); // 채워진 별 색
-        int inactiveColor = androidx.core.content.ContextCompat.getColor(this, android.R.color.darker_gray); // 비활성 별 색
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) { toast("로그인이 필요합니다."); return; }
 
-        for (int i = 0; i < stars.length; i++) {
-            ImageView star = stars[i];
+        ReviewItem item = new ReviewItem();
+        item.title = title;
+        item.place = place;
+        item.date = date;
+        item.rating = String.valueOf(selectedRating / 2.0);
+        item.tag1 = tag1;
+        item.tag2 = tag2;
+        item.body = body;
+        item.authorUid = user.getUid();
 
-            if (i < value) {
-                // 선택된 개수까지 채워진 별
-                star.setColorFilter(activeColor, android.graphics.PorterDuff.Mode.SRC_IN);
-            } else {
-                // 나머지는 회색
-                star.setColorFilter(inactiveColor, android.graphics.PorterDuff.Mode.SRC_IN);
-            }
+        if (!photoUris.isEmpty()) {
+            uploadAllImagesAndContinue(user.getUid(), photoUris, urls -> {
+                item.photoUrls = urls;
+                if (!urls.isEmpty()) {
+                    item.mainPhotoUrl = urls.get(0);
+                }
+                saveReviewItem(item);
+            });
+        } else {
+            saveReviewItem(item);
+        }
+    }
+
+    private interface UrlsCallback { void onDone(List<String> urls); }
+
+    private void uploadAllImagesAndContinue(String uid, List<Uri> uris, UrlsCallback cb) {
+        if (uris == null || uris.isEmpty()) {
+            cb.onDone(new ArrayList<>());
+            return;
+        }
+
+        final List<String> uploadedUrls = new ArrayList<>();
+        final int totalImages = uris.size();
+        final int[] uploadedCount = {0};
+
+        for (Uri uri : uris) {
+            String fileName = UUID.randomUUID().toString() + ".jpg";
+            StorageReference ref = FirebaseStorage.getInstance().getReference().child("review_images").child(uid).child(fileName);
+
+            ref.putFile(uri)
+                    .addOnSuccessListener(task -> ref.getDownloadUrl()
+                            .addOnSuccessListener(downloadUri -> {
+                                uploadedUrls.add(downloadUri.toString());
+                                uploadedCount[0]++;
+                                if (uploadedCount[0] == totalImages) {
+                                    cb.onDone(uploadedUrls);
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                toast("다운로드 URL 실패: " + e.getMessage());
+                                uploadedCount[0]++;
+                                if (uploadedCount[0] == totalImages) {
+                                    cb.onDone(uploadedUrls);
+                                }
+                            })
+                    )
+                    .addOnFailureListener(e -> {
+                        toast("사진 업로드 실패: " + e.getMessage());
+                        uploadedCount[0]++;
+                        if (uploadedCount[0] == totalImages) {
+                            cb.onDone(uploadedUrls);
+                        }
+                    });
+        }
+    }
+
+    private void saveReviewItem(ReviewItem item) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        if (isEditMode) {
+            db.collection("reviews").document(editReviewId).update(item.toMap())
+                    .addOnSuccessListener(v -> {
+                        toast("수정되었습니다.");
+                        Intent result = new Intent();
+                        result.putExtra(RESULT_REVIEW_ID, editReviewId);
+                        setResult(RESULT_OK, result);
+                        finish();
+                    })
+                    .addOnFailureListener(e -> toast("수정 실패: " + e.getMessage()));
+        } else {
+            Map<String, Object> data = new HashMap<>(item.toMap());
+            data.put("createdAt", com.google.firebase.firestore.FieldValue.serverTimestamp());
+            db.collection("reviews").add(data)
+                    .addOnSuccessListener(docRef -> {
+                        toast("후기가 등록되었습니다.");
+                        Intent result = new Intent();
+                        result.putExtra(RESULT_REVIEW_ID, docRef.getId());
+                        setResult(RESULT_OK, result);
+                        finish();
+                    })
+                    .addOnFailureListener(e -> toast("저장 실패: " + e.getMessage()));
         }
     }
 
@@ -152,35 +246,17 @@ public class ReviewWriteActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == REQ_PICK_IMAGES && resultCode == RESULT_OK && data != null) {
-
-            ClipData clipData = data.getClipData();
-
-            if (clipData != null) {
-                // 여러 장 선택
-                for (int i = 0; i < clipData.getItemCount(); i++) {
-                    if (photoUris.size() >= MAX_PHOTOS) {
-                        Toast.makeText(this, "최대 " + MAX_PHOTOS + "장까지 선택할 수 있어요.", Toast.LENGTH_SHORT).show();
-                        break;
-                    }
-                    Uri uri = clipData.getItemAt(i).getUri();
-                    if (!photoUris.contains(uri)) {
-                        photoUris.add(uri);
-                    }
+            if (data.getClipData() != null) {
+                for (int i = 0; i < data.getClipData().getItemCount(); i++) {
+                    if (photoUris.size() >= MAX_PHOTOS) break;
+                    photoUris.add(data.getClipData().getItemAt(i).getUri());
                 }
-            } else {
-                // 한 장만 선택
-                Uri uri = data.getData();
-                if (uri != null) {
-                    if (photoUris.size() >= MAX_PHOTOS && !photoUris.contains(uri)) {
-                        Toast.makeText(this, "최대 " + MAX_PHOTOS + "장까지 선택할 수 있어요.", Toast.LENGTH_SHORT).show();
-                    } else if (!photoUris.contains(uri)) {
-                        photoUris.add(uri);
-                    }
+            } else if (data.getData() != null) {
+                if (photoUris.size() < MAX_PHOTOS) {
+                    photoUris.add(data.getData());
                 }
             }
-
             photoAdapter.notifyDataSetChanged();
             updatePhotoCount();
         }
@@ -188,79 +264,90 @@ public class ReviewWriteActivity extends AppCompatActivity {
 
     private void updatePhotoCount() {
         tvPhotoCount.setText(photoUris.size() + "/" + MAX_PHOTOS);
-
-        // 개수에 따라 RecyclerView 보이기/숨기기
-        if (photoUris.isEmpty()) {
-            rvPhotos.setVisibility(View.GONE);
-        } else {
-            rvPhotos.setVisibility(View.VISIBLE);
-        }
+        rvPhotos.setVisibility(photoUris.isEmpty() ? View.GONE : View.VISIBLE);
     }
 
     private void showDatePicker() {
         final Calendar cal = Calendar.getInstance();
-        int year  = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH);
-        int day   = cal.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog dialog = new DatePickerDialog(
+        new DatePickerDialog(
                 this,
-                (view, y, m, d) -> {
-                    String text = String.format("%d.%02d.%02d 방문", y, m + 1, d);
-                    etDate.setText(text);
-                },
-                year, month, day
-        );
-        dialog.show();
+                (view, y, m, d) -> etDate.setText(String.format("%d.%02d.%02d 방문", y, m + 1, d)),
+                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)
+        ).show();
     }
 
-    private void submitReview() {
-        String title  = etTitle.getText().toString().trim();
-        String place  = etPlace.getText().toString().trim();
-        String date   = etDate.getText().toString().trim();
-        String tag1   = etTag1.getText().toString().trim();
-        String tag2   = etTag2.getText().toString().trim();
-        String body   = etBody.getText().toString().trim();
+    private void initStars() {
+        starWraps = new View[] {
+                findViewById(R.id.starWrap1),
+                findViewById(R.id.starWrap2),
+                findViewById(R.id.starWrap3),
+                findViewById(R.id.starWrap4),
+                findViewById(R.id.starWrap5)
+        };
+        starFg = new ImageView[] {
+                findViewById(R.id.starFg1),
+                findViewById(R.id.starFg2),
+                findViewById(R.id.starFg3),
+                findViewById(R.id.starFg4),
+                findViewById(R.id.starFg5)
+        };
+        for (ImageView v : starFg) {
+            v.setColorFilter(getResources().getColor(R.color.yellow), android.graphics.PorterDuff.Mode.SRC_IN);
+            v.setVisibility(View.GONE);
+        }
+    }
 
-        // 간단 검증 (필수값)
-        if (title.isEmpty()) {
-            Toast.makeText(this, "제목을 입력해 주세요.", Toast.LENGTH_SHORT).show();
-            return;
+    private void initStarClicks() {
+        for (int i = 0; i < starWraps.length; i++) {
+            final int idx = i;
+            starWraps[i].setOnClickListener(v -> {
+                int half = 2 * (idx + 1) - 1;
+                int full = 2 * (idx + 1);
+                if (selectedRating == half) setRating(full);
+                else if (selectedRating == full) setRating(half);
+                else setRating(half);
+            });
         }
-        if (place.isEmpty()) {
-            Toast.makeText(this, "방문한 건축물을 입력해 주세요.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (date.isEmpty()) {
-            Toast.makeText(this, "방문일자를 선택해 주세요.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (selectedRating == 0) {
-            Toast.makeText(this, "별점을 선택해 주세요.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (tag1.isEmpty() || tag2.isEmpty()) {
-            Toast.makeText(this, "감성 태그를 최소 2개 입력해 주세요.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (body.isEmpty()) {
-            Toast.makeText(this, "자세한 후기를 적어 주세요.", Toast.LENGTH_SHORT).show();
-            return;
-        }
+    }
 
-        // ReviewFragment로 결과 전달
-        Intent result = new Intent();
-        result.putExtra(RESULT_TITLE,  title);
-        result.putExtra(RESULT_PLACE,  place);
-        result.putExtra(RESULT_DATE,   date);
-        result.putExtra(RESULT_TAG1,   tag1);
-        result.putExtra(RESULT_TAG2,   tag2);
-        result.putExtra(RESULT_BODY,   body);
-        result.putExtra(RESULT_RATING, selectedRating);   // 1~5 정수 형태
+    private void setRating(int halfStarValue) {
+        selectedRating = Math.max(0, Math.min(10, halfStarValue));
+        int fullStars = selectedRating / 2;
+        boolean hasHalf = (selectedRating % 2) == 1;
+        for (int i = 0; i < starFg.length; i++) {
+            starFg[i].setVisibility(View.GONE);
+            starFg[i].setClipBounds(null);
+            if (i < fullStars) {
+                starFg[i].setVisibility(View.VISIBLE);
+            } else if (i == fullStars && hasHalf) {
+                starFg[i].setVisibility(View.VISIBLE);
+                final int finalI = i;
+                starFg[finalI].post(() -> {
+                    int w = starFg[finalI].getWidth();
+                    int h = starFg[finalI].getHeight();
+                    if (w > 0 && h > 0) {
+                        starFg[finalI].setClipBounds(new android.graphics.Rect(0, 0, w / 2, h));
+                    }
+                });
+            }
+        }
+    }
 
-        setResult(RESULT_OK, result);
+    private int parseRatingToHalfStars(String s) {
+        if (s == null) return 0;
+        s = s.replace("⭐", "").trim();
+        try {
+            return (int) Math.round(Double.parseDouble(s) * 2.0);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
 
-        Toast.makeText(this, "후기가 저장되었습니다.", Toast.LENGTH_SHORT).show();
-        finish();
+    private String safe(String s) {
+        return (s == null) ? "" : s;
+    }
+
+    private void toast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 }

@@ -18,6 +18,17 @@
         <item name="android:alpha">0</item>
     </style>
 
+    <style name="WeekDayText">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">#B0B6BD</item>
+        <item name="android:fontFamily">@font/pretendard_semi_bold</item>
+    </style>
+
     <!-- 로그아웃 다이얼로그 전용 테마 -->
     <style name="LogoutDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="android:background">@color/white</item>

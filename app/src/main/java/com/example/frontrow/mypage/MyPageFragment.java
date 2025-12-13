@@ -23,26 +23,19 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.frontrow.R;
 import com.example.frontrow.login.LoginActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class MyPageFragment extends Fragment {
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
-
     private ImageView imgAvatar;
 
-    // 갤러리에서 이미지 선택 결과 받는 런처
     private final ActivityResultLauncher<Intent> galleryLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
@@ -50,24 +43,6 @@ public class MyPageFragment extends Fragment {
             );
 
     public MyPageFragment() { }
-
-    public static MyPageFragment newInstance(String param1, String param2) {
-        MyPageFragment fragment = new MyPageFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     @Override
     public View onCreateView(
@@ -84,36 +59,53 @@ public class MyPageFragment extends Fragment {
     ) {
         super.onViewCreated(view, savedInstanceState);
 
+        imgAvatar = view.findViewById(R.id.imgAvatar);
+
         ImageView btnEditAvatar = view.findViewById(R.id.btnEditAvatar);
         TextView tvUserName = view.findViewById(R.id.tvUserName);
         TextView tvUserId   = view.findViewById(R.id.tvUserId);
 
-        // Firebase 유저 정보 표시
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             String email = user.getEmail();
             String name  = user.getDisplayName();
 
-            // 이메일/이름이 null일 수 있으니 방어 코드
-            if (name == null || name.isEmpty()) {
-                name = "익명 사용자";
-            }
+            if (name == null || name.isEmpty()) name = "익명 사용자";
             tvUserName.setText(name);
 
             if (email == null) email = "";
             tvUserId.setText(email);
+        } else {
+            tvUserName.setText("로그인이 필요합니다");
+            tvUserId.setText("");
         }
 
-        // 아바타 / 수정 아이콘 클릭 시 갤러리 열기
-        View.OnClickListener openGalleryListener = v2 -> openGallery();
-        btnEditAvatar.setOnClickListener(openGalleryListener);
+        btnEditAvatar.setOnClickListener(v -> openGallery());
 
-        // 로그아웃 메뉴
+        LinearLayout rowMyCard = view.findViewById(R.id.rowMyCard);
+        rowMyCard.setOnClickListener(v -> {
+            startActivity(new Intent(requireContext(), MyReviewsActivity.class));
+        });
+
+        LinearLayout rowCalendar = view.findViewById(R.id.rowCalendar);
+        rowCalendar.setOnClickListener(v -> {
+            startActivity(new Intent(requireContext(), MyCalendarActivity.class));
+        });
+
+        LinearLayout rowBookmarked = view.findViewById(R.id.rowBookmarked);
+        rowBookmarked.setOnClickListener(v -> {
+            startActivity(new Intent(requireContext(), BookmarkedPlacesActivity.class));
+        });
+
+        LinearLayout rowLikedReviews = view.findViewById(R.id.rowLikedReviews);
+        rowLikedReviews.setOnClickListener(v -> {
+            startActivity(new Intent(requireContext(), LikedReviewsActivity.class));
+        });
+
         LinearLayout rowLogout = view.findViewById(R.id.rowLogout);
         rowLogout.setOnClickListener(v -> showLogoutDialog());
     }
 
-    // 갤러리 열기 & 결과 처리
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
@@ -129,43 +121,37 @@ public class MyPageFragment extends Fragment {
         Uri imageUri = data.getData();
         if (imageUri == null) return;
 
-        // 여기서 실제로 ImageView에 반영
-        imgAvatar.setImageURI(imageUri);
-
-        // (선택) 나중에 다시 앱 켰을 때도 유지하려면 SharedPreferences에 Uri를 문자열로 저장해두고,
-        // onViewCreated에서 불러와서 setImageURI 해주면 됨.
+        if (imgAvatar != null) {
+            imgAvatar.setImageURI(imageUri);
+        }
     }
 
-    // 로그아웃 다이얼로그
     private void showLogoutDialog() {
-        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext(), R.style.LogoutDialogTheme)
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setTitle("로그아웃")
                 .setMessage("정말로 로그아웃 하시겠습니까?")
-                .setPositiveButton("예", (d, which) -> {
-                    // Firebase 로그아웃
+                .setPositiveButton("로그아웃", (d, which) -> {
+
                     FirebaseAuth.getInstance().signOut();
 
-                    // 구글 로그아웃
                     GoogleSignIn.getClient(
                             requireContext(),
                             new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
                     ).signOut();
 
-                    // 자동 로그인 플래그 정리
                     SharedPreferences prefs = requireContext()
                             .getSharedPreferences("frontrow_prefs", Context.MODE_PRIVATE);
                     prefs.edit()
                             .putBoolean("auto_login_enabled", false)
                             .apply();
 
-                    // 로그인 화면으로 이동 + 백스택 제거
                     Intent intent = new Intent(requireContext(), LoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
 
                     requireActivity().finish();
                 })
-                .setNegativeButton("아니오", (d, which) -> d.dismiss())
+                .setNegativeButton("취소", null)
                 .create();
 
         dialog.show();

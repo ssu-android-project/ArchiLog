@@ -11,7 +11,7 @@
         android:id="@+id/tvMyPageTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
         android:gravity="center"
@@ -45,10 +45,9 @@
                 android:layout_height="match_parent"
                 android:src="@drawable/ic_avatar"
                 android:scaleType="centerCrop"
-                android:background="@drawable/avartar_round"
+                android:background="@drawable/avatar_round"
                 android:layout_gravity="center"
-                android:padding="4dp"
-                android:cropToPadding="true" />
+                android:clipToOutline="true"/>
 
             <ImageView
                 android:id="@+id/btnEditAvatar"
@@ -121,30 +120,7 @@
                 android:src="@drawable/ic_menu_more" />
         </LinearLayout>
 
-        <!-- 내 답사 지도 -->
-        <LinearLayout
-            android:id="@+id/rowMyMap"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp"
-            android:gravity="center_vertical"
-            android:clickable="true"
-            android:focusable="true">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="내 답사 지도"
-                android:textSize="14sp"
-                android:fontFamily="@font/pretendard_semi_bold"/>
-
-            <ImageView
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:src="@drawable/ic_menu_more" />
-        </LinearLayout>
 
         <!-- 답사 캘린더 -->
         <LinearLayout

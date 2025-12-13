@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.frontrow.R;
 
 import java.util.List;
@@ -16,13 +17,13 @@ import java.util.List;
 public class ReviewPagerAdapter extends RecyclerView.Adapter<ReviewPagerAdapter.ReviewViewHolder> {
 
     public interface OnCardClickListener {
-        void onCardClick(ReviewCard card);
+        void onCardClick(ReviewItem item);
     }
 
-    private final List<ReviewCard> items;
+    private final List<ReviewItem> items;
     private final OnCardClickListener listener;
 
-    public ReviewPagerAdapter(List<ReviewCard> items, OnCardClickListener listener) {
+    public ReviewPagerAdapter(List<ReviewItem> items, OnCardClickListener listener) {
         this.items = items;
         this.listener = listener;
     }
@@ -40,43 +41,48 @@ public class ReviewPagerAdapter extends RecyclerView.Adapter<ReviewPagerAdapter.
         if (items == null || items.isEmpty()) return;
 
         int realPos = position % items.size();
-        ReviewCard card = items.get(realPos);
+        ReviewItem item = items.get(realPos);
 
-        holder.tvTitle.setText(card.getTitle());
-        holder.tvLocation.setText(card.getLocation());
-        holder.tvDate.setText(card.getDate());
-        holder.tvSubtitle.setText(card.getBody());
+        holder.tvTitle.setText(safe(item.title));
+        holder.tvLocation.setText(safe(item.place));
+        holder.tvDate.setText(safe(item.date));
+        holder.tvSubtitle.setText(safe(item.body));
 
-        String ratingText = "⭐ " + card.getRating();
-        holder.tvRating.setText(ratingText);
+        float ratingFloat = 0f;
+        try {
+            if (item.rating != null && !item.rating.trim().isEmpty()) {
+                ratingFloat = Float.parseFloat(item.rating.trim());
+            }
+        } catch (Exception ignored) {}
+        holder.tvRating.setText("⭐ " + ratingFloat);
 
-        holder.tag1.setText(card.getTag1());
-        holder.tag2.setText(card.getTag2());
+        holder.tag1.setText(safe(item.tag1));
+        holder.tag2.setText(safe(item.tag2));
 
-        holder.imgPlace.setImageResource(card.getImageResId());
+        String url = (item.mainPhotoUrl != null) ? item.mainPhotoUrl.trim() : "";
+        if (!url.isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(url)
+                    .placeholder(R.drawable.img_ecc)
+                    .error(R.drawable.img_ecc)
+                    .into(holder.imgPlace);
+        } else {
+            holder.imgPlace.setImageResource(R.drawable.img_ecc);
+        }
 
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onCardClick(card);
-            }
+            if (listener != null) listener.onCardClick(item);
         });
     }
 
     @Override
     public int getItemCount() {
-        // 무한 캐러셀용
         return (items == null || items.isEmpty()) ? 0 : Integer.MAX_VALUE;
     }
 
     static class ReviewViewHolder extends RecyclerView.ViewHolder {
         ImageView imgPlace;
-        TextView tvTitle;
-        TextView tvLocation;
-        TextView tvDate;
-        TextView tvRating;
-        TextView tvSubtitle;
-        TextView tag1;
-        TextView tag2;
+        TextView tvTitle, tvLocation, tvDate, tvRating, tvSubtitle, tag1, tag2;
 
         ReviewViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -89,5 +95,9 @@ public class ReviewPagerAdapter extends RecyclerView.Adapter<ReviewPagerAdapter.
             tag1       = itemView.findViewById(R.id.tag1);
             tag2       = itemView.findViewById(R.id.tag2);
         }
+    }
+
+    private String safe(String s) {
+        return (s == null) ? "" : s;
     }
 }

@@ -38,6 +38,18 @@
             android:name=".review.ReviewWriteActivity"
             android:exported="true" />
         <activity
+            android:name=".mypage.MyReviewsActivity"
+            android:exported="true" />
+        <activity
+            android:name=".mypage.MyCalendarActivity"
+            android:exported="true" />
+        <activity
+            android:name=".mypage.BookmarkedPlacesActivity"
+            android:exported="true" />
+        <activity
+            android:name=".mypage.LikedReviewsActivity"
+            android:exported="true" />
+        <activity
             android:name=".splash.SplashActivity"
             android:exported="true">
             <intent-filter>

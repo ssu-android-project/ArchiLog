@@ -50,10 +50,13 @@
                     tools:text="아모레퍼시픽 본사" />
 
                 <ImageView
+                    android:id="@+id/imgBookmarkDetail"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_bookmark"
-                    android:scaleType="centerInside" />
+                    android:scaleType="centerInside"
+                    android:clickable="true"
+                    android:focusable="true" />
             </LinearLayout>
 
             <!-- 건축가 -->

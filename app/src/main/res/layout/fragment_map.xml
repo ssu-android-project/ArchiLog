@@ -25,7 +25,10 @@
         android:orientation="vertical"
         android:clipToOutline="true"
         app:layout_behavior="@string/bottom_sheet_behavior"
-        tools:visibility="visible">
+        app:behavior_peekHeight="0dp"
+        app:behavior_fitToContents="true"
+        tools:visibility="visible"
+        android:clickable="true">
 
         <!-- 건물 이미지 -->
         <ImageView
@@ -43,35 +46,15 @@
             android:orientation="vertical"
             android:paddingHorizontal="16dp">
 
-            <!-- 제목 + 북마크 아이콘 한 줄 -->
-            <LinearLayout
-                android:id="@+id/title_row"
+            <!-- 제목 -->
+            <TextView
+                android:id="@+id/tvBuildingName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="2dp">
-
-                <!-- 건축물 이름 -->
-                <TextView
-                    android:id="@+id/tvBuildingName"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:paddingBottom="4dp"
-                    android:text="건축물 이름"
-                    android:textSize="16sp"
-                    android:fontFamily="@font/pretendard_extra_bold" />
-
-                <!-- 북마크 아이콘 -->
-                <ImageView
-                    android:id="@+id/imgBookmark"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_bookmark"
-                    android:scaleType="centerInside"
-                    android:padding="2dp" />
-            </LinearLayout>
+                android:paddingBottom="4dp"
+                android:text="건축물 이름"
+                android:textSize="16sp"
+                android:fontFamily="@font/pretendard_extra_bold" />
 
             <!-- 건축가 이름 -->
             <TextView
