@@ -39,9 +39,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
 
-    // PNG 아이콘 캐싱
     private BitmapDescriptor defaultIcon;
     private BitmapDescriptor selectedIcon;
+
+    private Marker selectedMarker = null;
+
+    private BottomSheetBehavior<View> bottomSheetBehavior;
+    private View bottomSheet;
+    private ImageView imgBuilding;
+    private TextView tvBuildingName;
+    private TextView tvArchitectName;
+    private TextView tvBuildingDesc;
+    private Button btnDetail;
+
+    private int topPadding = 0;
+    private int bottomPaddingWhenSheetOpen = 0;
+
+    private boolean keepSheetExpanded = false;
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("selectedIndex", selectedIndex);
+        outState.putBoolean("keepSheetExpanded", keepSheetExpanded);
+    }
 
     private BitmapDescriptor resizeMarker(int drawableRes, int width, int height) {
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), drawableRes);
@@ -49,23 +70,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return BitmapDescriptorFactory.fromBitmap(resized);
     }
 
-    // 현재 선택된 마커 저장
-    private Marker selectedMarker = null;
-
-    // 바텀시트 관련 뷰
-    private BottomSheetBehavior<View> bottomSheetBehavior;
-    private ImageView imgBuilding;
-    private TextView tvBuildingName;
-    private TextView tvArchitectName;
-    private TextView tvBuildingDesc;
-    private Button btnDetail;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        // fragment_map.xml 사용
         return inflater.inflate(R.layout.fragment_map, container, false);
     }
 
@@ -73,17 +82,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onViewCreated(@NonNull View root, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(root, savedInstanceState);
 
-        // PNG 아이콘 로드
+        if (savedInstanceState != null) {
+            selectedIndex = savedInstanceState.getInt("selectedIndex", -1);
+            keepSheetExpanded = savedInstanceState.getBoolean("keepSheetExpanded", false);
+        }
+
         defaultIcon = resizeMarker(R.drawable.marker_default, 60, 80);
         selectedIcon = resizeMarker(R.drawable.marker_selected, 80, 100);
 
-        // 바텀시트 뷰 초기화
-        View bottomSheet = root.findViewById(R.id.bottom_sheet);
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        bottomSheet = root.findViewById(R.id.bottom_sheet);
 
-        // 완전히 숨길 수 있게 허용
+        bottomSheet.setClickable(true);
+        bottomSheet.setFocusable(true);
+        bottomSheet.setOnClickListener(v -> { /* 클릭 소비 */ });
+
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheetBehavior.setHideable(true);
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN); // 시작은 숨김
+
+        bottomSheetBehavior.setPeekHeight(0, false);
+        bottomSheetBehavior.setSkipCollapsed(true);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
         imgBuilding     = root.findViewById(R.id.imgBuilding);
         tvBuildingName  = root.findViewById(R.id.tvBuildingName);
@@ -91,21 +109,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         tvBuildingDesc  = root.findViewById(R.id.tvBuildingDesc);
         btnDetail       = root.findViewById(R.id.btnDetail);
 
-        // 상세보기 버튼 -> PlaceDetailActivity로 이동
         btnDetail.setOnClickListener(v -> {
             if (selectedIndex == -1) return;
-
             Intent intent = new Intent(requireContext(), PlaceDetailActivity.class);
             intent.putExtra("place_index", selectedIndex);
             startActivity(intent);
         });
 
-        // 이 프래그먼트 안에 있는 지도 프래그먼트 찾기
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
 
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
+        if (mapFragment != null) mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (keepSheetExpanded && selectedIndex != -1) {
+            expandBottomSheetFully();
         }
     }
 
@@ -113,20 +134,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
 
-        // 지도 UI 버튼들 먼저 켜주기
         setupMapUi();
-        // 위치 권한 체크 후, 현위치 활성화
         enableMyLocation();
 
-        final int topPadding = getStatusBarHeight();   // 상태바 높이(px)
-        final int bottomPaddingWhenSheetOpen = (int) (
-                450 * getResources().getDisplayMetrics().density
-        ); // 바텀시트 높이 450dp → px 변환
+        topPadding = getStatusBarHeight();
+        bottomPaddingWhenSheetOpen = (int) (450 * getResources().getDisplayMetrics().density);
 
-        // PlaceRepository 에서 모든 장소 가져오기
-        Place[] places = PlaceRepository.PLACES;
-
-        // 더미 데이터 11개 (건축물 이름 + 위도/경도)
         LatLng[] positions =  {
                 new LatLng(37.528921, 126.968690),
                 new LatLng(37.566731, 127.009261),
@@ -149,119 +162,136 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
-        // 마커 뿌리기
         for (int i = 0; i < positions.length; i++) {
             Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(positions[i])
                     .title(names[i])
                     .icon(defaultIcon)
             );
+            if (marker != null) marker.setTag(i);
+            builder.include(positions[i]);
 
-            if (marker != null) {
-                marker.setTag(i); // 이 마커가 몇 번째 건물인지 태그로 저장
+            // If we are restoring state, re-select the marker
+            if (i == selectedIndex) {
+                if (selectedIcon != null) marker.setIcon(selectedIcon);
+                selectedMarker = marker;
             }
-
-            builder.include(positions[i]);   // 경계 박스에 추가
         }
 
-        // Bounds 객체 생성
         LatLngBounds bounds = builder.build();
         int padding = 150;
 
-        // 지도 뷰가 그려진 뒤 실행 (newLatLngBounds 에러 방지)
         mMap.setOnMapLoadedCallback(() ->
                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
         );
 
-        // 마커 클릭 시 : 아이콘 변경 + 바텀시트 내용 채우고 띄우기
         mMap.setOnMarkerClickListener(marker -> {
 
-            // 기존 선택된 마커 복구
-            if (selectedMarker != null) {
+            if (selectedMarker != null && defaultIcon != null) {
                 selectedMarker.setIcon(defaultIcon);
             }
-
-            // 새 마커를 선택 상태로 변경
-            marker.setIcon(selectedIcon);
+            if (selectedIcon != null) marker.setIcon(selectedIcon);
             selectedMarker = marker;
 
-            // 이 마커가 몇 번째 데이터인지 가져오기
             Object tag = marker.getTag();
             if (tag instanceof Integer) {
-                int index = (Integer) tag;
-                selectedIndex = index;
-
-                Place place = PlaceRepository.getPlace(index);
+                selectedIndex = (Integer) tag;
+                Place place = PlaceRepository.getPlace(selectedIndex);
 
                 imgBuilding.setImageResource(place.imageResId);
                 tvBuildingName.setText(place.name);
                 tvArchitectName.setText(place.architect);
                 tvBuildingDesc.setText(place.shortDesc);
             } else {
+                selectedIndex = -1;
                 tvBuildingName.setText(marker.getTitle());
                 tvArchitectName.setText(marker.getTitle());
                 tvBuildingDesc.setText("설명 정보가 없습니다.");
                 imgBuilding.setImageResource(R.drawable.sample_building);
             }
 
-            // 상태바 + 바텀시트 사이 영역을 “지도 유효 영역”으로 설정
-            mMap.setPadding(0, topPadding, 0, bottomPaddingWhenSheetOpen);
+            keepSheetExpanded = true;
 
-            // 카메라도 살짝 이동 (선택된 마커 쪽으로)
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+            if (mMap != null) {
+                mMap.setPadding(0, topPadding, 0, bottomPaddingWhenSheetOpen);
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+            }
 
-            // 바텀시트 보이게
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-
+            expandBottomSheetFully();
             return true;
         });
 
-        // 지도 빈 곳 클릭 시 바텀시트 선택 해제
         mMap.setOnMapClickListener(latLng -> {
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-
-            if (selectedMarker != null) {
-                selectedMarker.setIcon(defaultIcon);
-                selectedMarker = null;
-            }
-
-            selectedIndex = -1;
+            keepSheetExpanded = false;
+            hideBottomSheetAndReset();
         });
+
+        if (keepSheetExpanded && selectedIndex != -1) {
+            // Update the sheet content for the restored selection
+            Place place = PlaceRepository.getPlace(selectedIndex);
+            if (place != null) {
+                imgBuilding.setImageResource(place.imageResId);
+                tvBuildingName.setText(place.name);
+                tvArchitectName.setText(place.architect);
+                tvBuildingDesc.setText(place.shortDesc);
+            }
+            expandBottomSheetFully();
+        }
+    }
+
+    private void expandBottomSheetFully() {
+        if (bottomSheetBehavior == null || bottomSheet == null) return;
+
+        bottomSheetBehavior.setPeekHeight(0, true);
+        bottomSheetBehavior.setSkipCollapsed(true);
+
+        bottomSheet.post(() -> {
+            if (bottomSheetBehavior != null) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+        });
+    }
+
+    private void hideBottomSheetAndReset() {
+        if (bottomSheetBehavior != null) {
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        }
+
+        if (selectedMarker != null && defaultIcon != null) {
+            selectedMarker.setIcon(defaultIcon);
+            selectedMarker = null;
+        }
+
+        selectedIndex = -1;
+
+        if (mMap != null) {
+            mMap.setPadding(0, topPadding, 0, 0);
+        }
     }
 
     private int getStatusBarHeight() {
         int result = 0;
-        int resourceId = getResources().getIdentifier(
-                "status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
-        }
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) result = getResources().getDimensionPixelSize(resourceId);
         return result;
     }
 
-    // 지도 UI 버튼들 설정 (줌 버튼, 나침반, 내 위치 버튼 등)
     private void setupMapUi() {
         if (mMap == null) return;
-
         UiSettings uiSettings = mMap.getUiSettings();
-        uiSettings.setZoomControlsEnabled(true);       // + / - 줌 버튼
-        uiSettings.setCompassEnabled(true);            // 나침반
-        uiSettings.setMyLocationButtonEnabled(true);   // 내 위치 버튼 (현위치 활성화해야 보임)
-        uiSettings.setMapToolbarEnabled(true);         // 구글맵 앱으로 가는 툴바 (길찾기 등)
+        uiSettings.setZoomControlsEnabled(true);
+        uiSettings.setCompassEnabled(true);
+        uiSettings.setMyLocationButtonEnabled(true);
+        uiSettings.setMapToolbarEnabled(true);
     }
 
-    // 위치 권한 체크 + 현위치 활성화
     private void enableMyLocation() {
         if (mMap == null) return;
 
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED) {
-
-            mMap.setMyLocationEnabled(true); // 지도에 파란 점 + 내 위치 버튼 활성화
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
         } else {
-            // 프래그먼트용 권한 요청
             requestPermissions(
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE
@@ -269,7 +299,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    // 권한 요청 결과 처리 (프래그먼트 버전)
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
@@ -277,9 +306,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                enableMyLocation();  // 다시 시도
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                enableMyLocation();
             }
         }
     }

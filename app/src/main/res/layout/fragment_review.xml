@@ -1,14 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".review.ReviewFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <!-- ✨ 상단 문구 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="10dp"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/tvHeadline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="모두의 솔직한 건축 기록을 엿보다"
+            android:textSize="20sp"
+            android:textColor="#222222"
+            android:fontFamily="@font/pretendard_semi_bold" />
+
+        <TextView
+            android:id="@+id/tvSubline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="연출 없이, 경험 그대로"
+            android:textSize="16sp"
+            android:textColor="#8A8A8A"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/pretendard_extra_light" />
+    </LinearLayout>
+
+    <!-- 답사 후기 카드 스와이프 -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vpReview"
+        android:layout_width="400dp"
+        android:layout_height="600dp"
+        android:padding="32dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="40dp"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        android:overScrollMode="never" />
+
+    <!-- 후기 작성 플로팅 버튼 -->
+    <ImageView
+        android:id="@+id/btnAddReview"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="@drawable/btn_floating"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="100dp"
+        android:layout_marginEnd="20dp"
+        android:clickable="true"
+        android:focusable="true" />
 
 </FrameLayout>

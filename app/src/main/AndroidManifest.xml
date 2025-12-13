@@ -11,25 +11,46 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FrontRow">
+        <activity
+            android:name=".review.ReviewDetailActivity"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAA_Tq1Tub3EqeD1uiKhSVA-juNpi5wp0o" />
 
         <activity
-            android:name=".login.SignUpActivity"
-            android:exported="false" />
-        <activity
             android:name=".login.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".map.PlaceDetailActivity"
+            android:name=".login.SignUpActivity"
             android:exported="false" />
-
         <activity
             android:name=".MainActivity"
+            android:exported="true" />
+        <activity
+            android:name=".map.PlaceDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".review.ReviewWriteActivity"
+            android:exported="true" />
+        <activity
+            android:name=".mypage.MyReviewsActivity"
+            android:exported="true" />
+        <activity
+            android:name=".mypage.MyCalendarActivity"
+            android:exported="true" />
+        <activity
+            android:name=".mypage.BookmarkedPlacesActivity"
+            android:exported="true" />
+        <activity
+            android:name=".mypage.LikedReviewsActivity"
+            android:exported="true" />
+        <activity
+            android:name=".splash.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
